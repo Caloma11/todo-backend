@@ -5,3 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+12.times do
+
+  Note.create(
+    title: Faker::Book.title,
+    description: + Faker::Verb.base.capitalize + " " + Faker::Games::ElderScrolls.last_name + "\'s " + " " + Faker::Verb.past + " " + [Faker::Games::ElderScrolls.jewelry, Faker::Games::ElderScrolls.weapon].sample
+  )
+
+end
