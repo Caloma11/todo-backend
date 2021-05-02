@@ -34,6 +34,13 @@ class Api::V1::NotesController < Api::V1::BaseController
     # No need to create a `destroy.json.jbuilder` view
   end
 
+  def bulk_destroy
+    params[:notes].each do |note_id|
+      Note.find(note_id)&.destroy
+    end
+    render json: { message: "Notes successfully deleted"}
+  end
+
   private
 
   def set_note
