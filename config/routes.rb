@@ -8,5 +8,7 @@ Rails.application.routes.draw do
     end
   end
 
+  post "/login", to: "users#login", as: :login
+  get "/login", to: "users#token_authenticate", as: :token_auth
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
