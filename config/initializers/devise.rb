@@ -14,7 +14,7 @@ Devise.setup do |config|
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  # config.secret_key = '6d7974ea488abc4e171a74a4a4690e7cbfa25c1e0ea50ca50d8a96ee7631331ac04e6e36be5f4f13f7d82de642322f81f4f6a6a44b2837f158be536f362bf072'
+  # config.secret_key = 'c1f1007a0d2f4909af69f90e36a6e939ffb2d376941332bd735124317cd1e08d4b04b2572ba789617cfb88732a5fd0368780e4f408b33a7b67bfdd841d9b32b3'
 
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
@@ -126,7 +126,7 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 12
 
   # Set up a pepper to generate the hashed password.
-  # config.pepper = 'a8d0a879f6188febe976912cdf1be7f203c320b70869c32af7b041438f1bb998ce1d880c9f9c4b7e2a5c0575d1224211f4b1be0470c1053a2fe5799be6bbe6e4'
+  # config.pepper = '19d9c132eb78f3f3b07fc7b89e404f46483fe5d4e572b3dca0f306fce8ad571c5f8e9d2e8ad43b3416b4af92c3901e0020f8125b7808fc8f59675798166ae7a7'
 
   # Send a notification to the original email when the user's email is changed.
   # config.send_email_changed_notification = false
@@ -276,11 +276,12 @@ Devise.setup do |config|
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.
-  #
-  # config.warden do |manager|
-  #   manager.intercept_401 = false
-  #   manager.default_strategies(scope: :user).unshift :some_external_strategy
-  # end
+
+  config.warden do |manager|
+    # manager.intercept_401 = false
+    manager.strategies.add(:jwt, Devise::Strategies::JWT)
+    manager.default_strategies(scope: :user).unshift :jwt
+  end
 
   # ==> Mountable engine configurations
   # When using Devise inside an engine, let's call it `MyEngine`, and this engine
@@ -308,4 +309,24 @@ Devise.setup do |config|
   # When set to false, does not sign a user in automatically after their password is
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
+end
+
+module Devise
+  module Strategies
+    class JWT < Base
+      def valid?
+        request.headers["Authorization"].present?
+      end
+
+      def authenticate!
+        token = request.headers.fetch("Authorization", "").split(" ").last
+        payload = JsonWebToken.decode(token)
+        success!(User.find(payload["sub"]))
+        rescue ::JWT::ExpiredSignature
+          fail! "Auth token has expired"
+        rescue ::JWT::DecodeError
+          fail! "Auth token is invalid"
+      end
+    end
+  end
 end

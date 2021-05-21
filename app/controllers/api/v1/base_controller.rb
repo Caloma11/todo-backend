@@ -1,4 +1,6 @@
 class Api::V1::BaseController < ActionController::API
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_user!
   # include Pundit
 
   # after_action :verify_authorized, except: :index
