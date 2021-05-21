@@ -1,10 +1,9 @@
 class Api::V1::AuthenticationController < Api::V1::BaseController
-  # skip_before_action :authenticate_token!
+  skip_before_action :authenticate_user!
 
   def create
     user = User.find_by(email: params[:user][:email])
-    # check if valid password with devise
-    if user.valid_password?(params[:user][:password])
+    if user && user.valid_password?(params[:user][:password])
       render json: { token: JsonWebToken.encode(sub: user.id) }
     else
       render json: { errors: ["Invalid email or password" ]}
