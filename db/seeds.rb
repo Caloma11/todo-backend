@@ -6,11 +6,21 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-12.times do
+User.create!(email: 'me@gmail.com', password: 123123)
+User.create!(email: 'you@gmail.com', password: 123123)
 
-  Note.create(
+12.times do
+  Note.create!(
+    user: User.first,
     title: Faker::Book.title,
     description: + Faker::Verb.base.capitalize + " " + Faker::Games::ElderScrolls.last_name + "\'s " + " " + Faker::Verb.past + " " + [Faker::Games::ElderScrolls.jewelry, Faker::Games::ElderScrolls.weapon].sample
   )
+end
 
+4.times do
+  Note.create!(
+    user: User.last,
+    title: "You shouldn't see this",
+    description: "I mean it"
+  )
 end

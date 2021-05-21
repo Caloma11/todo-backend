@@ -2,7 +2,11 @@ class Api::V1::NotesController < Api::V1::BaseController
   before_action :set_note, only: [:update, :destroy, :show]
 
   def index
-    @notes = Note.order('updated_at DESC')
+    if current_user
+      @notes = Note.where(user: current_user).order('updated_at DESC')
+    else
+      @notes = [Note.new(id: 999, title: "You aint logged in", description: "You aint logged in")]
+    end
     # .map(&:attributes).map { |note| note.deep_transform_keys(&:to_sym) }
     # @notes.first[:active] = true
   end
@@ -12,7 +16,7 @@ class Api::V1::NotesController < Api::V1::BaseController
 
   def create
     @note = Note.new(note_params)
-    # @note.user = current_user
+    @note.user = current_user
     if @note.save
       render :show, status: :created
     else
@@ -21,7 +25,7 @@ class Api::V1::NotesController < Api::V1::BaseController
   end
 
   def update
-    if @note.update(note_params)
+    if @note.update(note_params) && current_user == @note.user
       render :show
     else
       render_error
