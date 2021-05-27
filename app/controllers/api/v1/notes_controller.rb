@@ -2,8 +2,9 @@ class Api::V1::NotesController < Api::V1::BaseController
   before_action :set_note, only: [:update, :destroy, :show]
 
   def index
+    # authenticate_user!
     if current_user
-      @notes = Note.where(user: current_user).order('updated_at DESC')
+      @notes = current_user.notes.order('updated_at DESC')
     else
       @notes = [Note.new(id: 999, title: "You aint logged in", description: "You aint logged in")]
     end

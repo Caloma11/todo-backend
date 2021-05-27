@@ -1,5 +1,6 @@
 class Api::V1::BaseController < ActionController::API
   skip_before_action :verify_authenticity_token, raise: false
+  # before_action :debug
   before_action :authenticate_user!
   # include Pundit
 
@@ -20,4 +21,5 @@ class Api::V1::BaseController < ActionController::API
   # def not_found(exception)
   #   render json: { error: exception.message }, status: :not_found
   # end
+
 end
